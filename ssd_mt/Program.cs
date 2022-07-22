@@ -19,13 +19,14 @@ if (command == "c")
     stopwatch.Start();
     int count = 50000;
     Console.WriteLine($"write {count}");
-    for(int i = 0; i < count; i++)
+    Console.WriteLine(DateTime.Now.ToString());
+
+    for (int i = 0; i < count; i++)
     {
 
         Random random = new Random();
 
-        byte[] bytes = new byte[random.NextInt64() % 65536 + 4096]; 
-        // range 4096 ~ (4096+65536)
+        byte[] bytes = new byte[random.NextInt64() % (65536-2048) + 2048]; // range 2048 ~ 65536
 
         random.NextBytes(bytes);
 
@@ -43,8 +44,10 @@ else
     if (command == "s")
     {
         Console.WriteLine("read Single");
+        Console.WriteLine(DateTime.Now.ToString());
+
         stopwatch.Start();
-        foreach(String file in files)
+        foreach (String file in files)
         {
             readFile(bytes, stringBuilder, file);
         }
@@ -56,8 +59,11 @@ else
 
         int threadCount = int.TryParse(count, out threadCount) ? threadCount : 64;
         ThreadPool.SetMinThreads(threadCount, threadCount);
+        ThreadPool.SetMaxThreads(threadCount, threadCount);
 
         Console.WriteLine($"read MT ({threadCount})");
+        Console.WriteLine(DateTime.Now.ToString());
+
         stopwatch.Start();
         Parallel.ForEach(files, (file) =>
         {
@@ -68,7 +74,7 @@ else
 
     // Console.WriteLine(stringBuilder.ToString());
 }
-
+Console.WriteLine(DateTime.Now.ToString());
 Console.WriteLine($"Elapsed time :  {stopwatch.Elapsed.TotalSeconds}");
 
 static void readFile(ConcurrentBag<byte[]> bytes, StringBuilder stringBuilder, string file)
