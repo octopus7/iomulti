@@ -5,6 +5,7 @@ using System.Text;
 Console.WriteLine("'c' : create files");
 Console.WriteLine("'s' : single thread read");
 Console.WriteLine("'m' : multi thread read");
+Console.WriteLine("'a' : async read");
 string? command = Console.ReadLine();
 Console.WriteLine($"command : {command}");
 
@@ -40,8 +41,29 @@ else
     StringBuilder stringBuilder = new StringBuilder();
     var files = Directory.GetFiles(path);
 
-    
-    if (command == "s")
+    if (command == "a")
+    {
+        Console.WriteLine("read Async");
+        Console.WriteLine(DateTime.Now.ToString());
+
+        List<Task<byte[]>> tasks = new List<Task<byte[]>>();
+
+        stopwatch.Start();
+        foreach (String file in files)
+        {
+            Task<byte[]> task = File.ReadAllBytesAsync(file); // readFileAsync(bytes, stringBuilder, file);
+            tasks.Add(task);
+        }   
+        Console.WriteLine("began : " + DateTime.Now.ToString());
+
+        while (tasks.Count > 0)
+        {
+            tasks.RemoveAll(t => t.IsCompleted);
+            Thread.Sleep(0);
+        }
+
+    }
+    else if (command == "s")
     {
         Console.WriteLine("read Single");
         Console.WriteLine(DateTime.Now.ToString());
@@ -83,3 +105,8 @@ static void readFile(ConcurrentBag<byte[]> bytes, StringBuilder stringBuilder, s
     bytes.Add(bin);
     stringBuilder.AppendLine(file + " " + bin.Length);
 }
+
+//static async Task<byte[]> readFileAsync(ConcurrentBag<byte[]> bytes, StringBuilder stringBuilder, string file)
+//{
+//    await File.ReadAllBytesAsync(file);
+//}
