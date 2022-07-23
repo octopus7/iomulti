@@ -51,7 +51,7 @@ else
         stopwatch.Start();
         foreach (String file in files)
         {
-            Task<byte[]> task = File.ReadAllBytesAsync(file); // readFileAsync(bytes, stringBuilder, file);
+            Task<byte[]> task = Task.Run(() => File.ReadAllBytesAsync(file));
             tasks.Add(task);
         }   
         Console.WriteLine("began : " + DateTime.Now.ToString());
@@ -59,9 +59,8 @@ else
         while (tasks.Count > 0)
         {
             tasks.RemoveAll(t => t.IsCompleted);
-            Thread.Sleep(0);
+            Thread.Sleep(1);
         }
-
     }
     else if (command == "s")
     {
